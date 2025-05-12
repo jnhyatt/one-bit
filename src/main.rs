@@ -7,7 +7,7 @@ use std::{
 };
 
 use bevy::{
-    asset::RenderAssetUsages,
+    asset::{AssetMetaCheck, RenderAssetUsages},
     core_pipeline::tonemapping::Tonemapping,
     ecs::system::{SystemParam, SystemState},
     input::{ButtonState, keyboard::KeyboardInput},
@@ -32,7 +32,21 @@ const LAYER_UI: usize = 1;
 fn main() {
     App::new()
         .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Window {
+                        title: "Lineland".to_string(),
+                        fit_canvas_to_parent: true,
+                        ..default()
+                    }
+                    .into(),
+                    ..default()
+                })
+                .set(ImagePlugin::default_nearest())
+                .set(AssetPlugin {
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                }),
             EnhancedInputPlugin,
             AsyncTasksPlugin,
             contact::contact_plugin,
@@ -398,12 +412,12 @@ fn setup(assets: Res<AssetServer>, offscreen_buffer: Res<OffscreenBuffer>, mut c
                     Children::spawn((
                         Spawn((
                             Text::new(""),
-                            TextFont::from_font(font.clone()).with_font_size(48.0),
+                            TextFont::from_font(font.clone()).with_font_size(40.0),
                             TextColor(Color::WHITE),
                         )),
                         Spawn((
                             Text::new(""),
-                            TextFont::from_font(font.clone()).with_font_size(36.0),
+                            TextFont::from_font(font.clone()).with_font_size(24.0),
                             TextColor(Color::WHITE),
                         )),
                     )),
