@@ -21,3 +21,9 @@ bevy_mod_async = "0.10"
 earcutr = "0.4"
 futures = "0.3.31"
 geo = "0.30"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
