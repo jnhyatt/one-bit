@@ -72,11 +72,7 @@ fn main() {
             (
                 (tick_time_remaining, handle_portal_reached)
                     .run_if(resource_exists::<TimeRemaining>),
-                (
-                    unload_level.run_if(resource_changed_or_removed::<CurrentLevel>),
-                    load_level.run_if(resource_exists_and_changed::<CurrentLevel>),
-                )
-                    .chain(),
+                load_level.run_if(resource_exists_and_changed::<CurrentLevel>),
             ),
         )
         .run();
@@ -261,15 +257,17 @@ impl FromWorld for OffscreenBuffer {
     }
 }
 
-/// Only run if level changed or removed
-fn unload_level(last_level: Query<Entity, With<WorldRoot>>, mut commands: Commands) {
-    for entity in &last_level {
-        commands.entity(entity).despawn();
-    }
-}
-
-// Only run if level changed and only after unload_level
+// Runs when a new `CurrentLevel` resource is inserted.
 fn load_level(world: &mut World) {
+    info!("Unloading level");
+    let to_despawn = world
+        .query_filtered::<Entity, With<WorldRoot>>()
+        .iter(world)
+        .collect::<Vec<_>>();
+    for entity in to_despawn {
+        world.entity_mut(entity).despawn();
+    }
+    info!("Loading level");
     let current_level = world.resource::<CurrentLevel>().0;
     let levels = world.resource::<Levels>();
     let level = levels.0[current_level].clone();
